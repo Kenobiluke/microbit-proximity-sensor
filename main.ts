@@ -1,5 +1,7 @@
 input.onButtonPressed(Button.A, function () {
     mode = 3
+    basic.pause(500)
+    basic.clearScreen()
     basic.showString("M0")
     basic.pause(200)
     mode = 0
