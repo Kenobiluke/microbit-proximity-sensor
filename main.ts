@@ -1,42 +1,41 @@
-input.onButtonPressed(Button.A, function () {
-    mode = 3
-    basic.pause(500)
-    basic.clearScreen()
-    basic.showString("M0")
-    basic.pause(200)
-    mode = 0
-})
-input.onButtonPressed(Button.AB, function () {
-    setupComplete = 1
-    basic.clearScreen()
-})
-radio.onReceivedString(function (receivedString) {
+radio.onReceivedNumber(function (receivedNumber) {
     signal = radio.receivedPacket(RadioPacketProperty.SignalStrength)
     if (mode == 1) {
-        if (receivedString == "73") {
+        if (recievingOptimal == Group) {
             led.plotBarGraph(
-            Math.map(signal, -95, -50, 0, 9),
+            Math.map(signal, -128, -60, 0, 9),
             9
             )
-        } else {
-            basic.clearScreen()
         }
     }
+})
+input.onButtonPressed(Button.A, function () {
+    mode = 3
+    if (recievingOptimal < 5) {
+        recievingOptimal += 1
+    } else {
+        recievingOptimal = 1
+    }
+    basic.clearScreen()
+    basic.showString("RO = " + recievingOptimal)
+    mode = 1
 })
 input.onButtonPressed(Button.B, function () {
     basic.clearScreen()
     if (mode == 1) {
         mode = 3
         if (Group <= 4) {
-            radio.sendString("0")
             Group += 1
+            radio.sendNumber(10)
         } else {
             Group = 1
+            radio.sendNumber(10)
         }
         basic.clearScreen()
-        basic.showString("" + (Group))
+        basic.showString("BC = " + Group)
         basic.pause(500)
         basic.clearScreen()
+        radio.sendNumber(10)
         mode = 1
     } else {
         mode = 3
@@ -47,17 +46,19 @@ input.onButtonPressed(Button.B, function () {
 })
 let degrees = 0
 let signal = 0
-let setupComplete = 0
 let mode = 0
 let Group = 0
+let recievingOptimal = 0
+recievingOptimal = 1
+radio.setGroup(42)
+led.setBrightness(255)
 Group = 1
-radio.setTransmitPower(2)
+radio.setTransmitPower(1)
 mode = 1
 basic.pause(100)
 basic.showString("" + (Group))
 basic.forever(function () {
-    radio.setGroup(Group + 49)
-    radio.sendString("73")
+    radio.sendNumber(Group)
     basic.pause(200)
 })
 basic.forever(function () {
